@@ -1,1 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centro de Descargas</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:'Inter', sans-serif;
+    background:#0b0f19;
+    color:#e5e7eb;
+    animation:fadeBody 0.6s ease;
+}
+
+@keyframes fadeBody{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+
+header{
+    background:#111827;
+    padding:18px 30px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #1f2937;
+}
+
+header h1{
+    margin:0;
+    font-size:20px;
+    font-weight:600;
+    color:#fff;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    padding:30px;
+}
+
+/* SEARCH */
+.search-box{
+    margin-bottom:20px;
+}
+
+.search-box input{
+    width:100%;
+    padding:12px 14px;
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:10px;
+    color:white;
+    font-size:14px;
+    transition:0.3s;
+}
+
+.search-box input:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 2px rgba(37,99,235,0.3);
+    outline:none;
+}
+
+/* TABLE */
+.table-wrapper{
+    background:#111827;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid #1f2937;
+    animation:fadeSlide 0.5s ease;
+}
+
+@keyframes fadeSlide{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    background:#1f2937;
+}
+
+th{
+    text-align:left;
+    padding:16px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:#9ca3af;
+}
+
+td{
+    padding:16px;
+    border-top:1px solid #1f2937;
+    font-size:14px;
+    transition:all 0.25s ease;
+}
+
+tr{
+    opacity:0;
+    transform:translateY(8px);
+    animation:rowFade 0.4s forwards;
+}
+
+@keyframes rowFade{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+tr:hover{
+    background:#161b2e;
+    transform:scale(1.01);
+}
+
+/* BUTTONS */
+button{
+    background:#2563eb;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    color:white;
+    font-size:13px;
+    cursor:pointer;
+    transition:all 0.2s ease;
+}
+
+button:hover{
+    background:#1d4ed8;
+    transform:translateY(-2px);
+}
+
+button:active{
+    transform:scale(0.96);
+}
+
+.back-btn{
+    background:#374151;
+}
+
+.back-btn:hover{
+    background:#4b5563;
+}
+
+/* FOLDER / FILE COLORS */
+.folder{
+    color:#fbbf24;
+    font-weight:500;
+}
+
+.file{
+    color:#60a5fa;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>📂 Centro de Descargas</h1>
+    <button class="back-btn" onclick="goBack()">⬅ Volver</button>
+</header>
+
+<div class="container">
+
+<div class="search-box">
+    <input type="text" id="search" placeholder="Buscar archivo o carpeta...">
+</div>
+
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Tipo</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody id="fileTable"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+let fileSystem = {
+    root: {
+        folders: {
+            "Proyectos": {
+                folders: {},
+                files: [
+                    {
+                        name:"diseño_web.zip",
+                        type:"ZIP",
+                        link:"https://example.com/archivo1.zip"
+                    },
+                    {
+                        name:"presupuesto.xlsx",
+                        type:"XLSX",
+                        link:"https://example.com/archivo2.xlsx"
+                    }
+                ]
+            }
+        },
+        files: [
+            {
+                name:"Manual.pdf",
+                type:"PDF",
+                link:"https://example.com/manual.pdf"
+            },
+            {
+                name:"Instalador.exe",
+                type:"EXE",
+                link:"https://example.com/instalador.exe"
+            }
+        ]
+    }
+};
+
+let currentPath = ["root"];
+
+function getCurrentFolder(){
+    let folder = fileSystem;
+    for(let p of currentPath){
+        folder = folder[p];
+    }
+    return folder;
+}
+
+function render(){
+    let table = document.getElementById("fileTable");
+    let search = document.getElementById("search").value.toLowerCase();
+    table.innerHTML="";
+    let folder = getCurrentFolder();
+
+    for(let name in folder.folders){
+        if(name.toLowerCase().includes(search)){
+            table.innerHTML += `
+            <tr>
+                <td class="folder">📁 ${name}</td>
+                <td>Carpeta</td>
+                <td>
+                    <button onclick="openFolder('${name}')">Abrir</button>
+                </td>
+            </tr>
+            `;
+        }
+    }
+
+    folder.files
+    .filter(f => f.name.toLowerCase().includes(search))
+    .forEach(file=>{
+        table.innerHTML += `
+        <tr>
+            <td class="file">📄 ${file.name}</td>
+            <td>${file.type}</td>
+            <td>
+                <a href="${file.link}" target="_blank">
+                    <button>Descargar</button>
+                </a>
+            </td>
+        </tr>
+        `;
+    });
+}
+
+function openFolder(name){
+    currentPath.push("folders");
+    currentPath.push(name);
+    render();
+}
+
+function goBack(){
+    if(currentPath.length > 1){
+        currentPath.pop();
+        currentPath.pop();
+        render();
+    }
+}
+
+document.getElementById("search").addEventListener("input", render);
+
+render();
+</script>
+
+</body>
+</html>
