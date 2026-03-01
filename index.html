@@ -203,23 +203,16 @@ button:active{
 <script>
 let fileSystem = {
     root: {
-        folders: {
-            "Proyectos": {
-                folders: {},
-                files: [
-                    {
-                        name:"diseño_web.zip",
-                        type:"ZIP",
-                        link:"https://example.com/archivo1.zip"
-                    },
-                    {
-                        name:"presupuesto.xlsx",
-                        type:"XLSX",
-                        link:"https://example.com/archivo2.xlsx"
-                    }
-                ]
+        folders: [
+            {
+                name:"Proyectos 🔒",
+                link:"/proyectos/"
+            },
+            {
+                name:"Backup 🔒",
+                link:"/backup/"
             }
-        },
+        ],
         files: [
             {
                 name:"Manual.pdf",
@@ -249,22 +242,26 @@ function render(){
     let table = document.getElementById("fileTable");
     let search = document.getElementById("search").value.toLowerCase();
     table.innerHTML="";
-    let folder = getCurrentFolder();
+    let folder = fileSystem.root;
 
-    for(let name in folder.folders){
-        if(name.toLowerCase().includes(search)){
-            table.innerHTML += `
-            <tr>
-                <td class="folder">📁 ${name}</td>
-                <td>Carpeta</td>
-                <td>
-                    <button onclick="openFolder('${name}')">Abrir</button>
-                </td>
-            </tr>
-            `;
-        }
-    }
+    // Carpetas con redirección
+    folder.folders
+    .filter(f => f.name.toLowerCase().includes(search))
+    .forEach(folder=>{
+        table.innerHTML += `
+        <tr>
+            <td class="folder">📁 ${folder.name}</td>
+            <td>Carpeta</td>
+            <td>
+                <a href="${folder.link}">
+                    <button>Abrir</button>
+                </a>
+            </td>
+        </tr>
+        `;
+    });
 
+    // Archivos
     folder.files
     .filter(f => f.name.toLowerCase().includes(search))
     .forEach(file=>{
