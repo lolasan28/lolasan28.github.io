@@ -142,10 +142,8 @@ button:hover{
 <nav>
     <div class="logo">🖼 ImageCenter</div>
     <div class="menu">
-        <a href="index.html" class="active">Inicio</a>
-        <a href="#">Categorías</a>
-        <a href="#">Populares</a>
-        <a href="#">Contacto</a>
+        <a href="https://lyla.uno" class="active">Inicio</a>
+        <a href="https://lyla.uno/sven-coop-models/">Sven coop Models</a>
     </div>
 </nav>
 
